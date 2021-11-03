@@ -11,15 +11,13 @@ BOT = {
                                     fr'\AppData\Roaming\undetected_chromedriver\chromedriver.exe',
 }
 QUERIES = {
-
     'searching_queries': [
         'Query_1',
         'Query_2'
-
     ],
     'video_title': '',
     'video_duration': 15,
-    'filter_type': 'MWD',  # (D, MWD, H, N). M - month, W - week, D - day, H - hour, N - None
+    'filter_type': 'MWD',  # (D, MDH, MWD, H, N). M - month, W - week, D - day, H - hour, N - None
     'scrolling_times': 7,
     'repeats': 20
 }

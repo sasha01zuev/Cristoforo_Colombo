@@ -27,6 +27,51 @@ def scrolling(browser, direction: str = "DOWN", scrolling_times: int = 5):
         time.sleep(random.randint(1, 3))
 
 
+def searching_video(browser, video_elements, video_title: str, video_duration: int,
+                    video_exist: bool = False, scrolling_times: int = 5, time_sleep: random = random.randint(1, 3)):
+    for _ in range(scrolling_times):
+        browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.END)
+        time.sleep(random.randint(1, 2))
+        if len(video_elements) > 0:
+            browser.execute_script("arguments[0].scrollIntoViewIfNeeded();", video_elements[-1])
+            logger.debug(f'Founded elements with video title: {len(video_elements)}')
+            time.sleep(time_sleep)
+            video_elements[-1].click()
+            logger.info(f'Video "{video_title}" was found and clicked!')
+            video_exist = True
+            break
+        else:
+            pass
+    else:
+        raise se.NoSuchElementException
+
+    if video_exist:
+        time.sleep(video_duration)
+        logger.success(f'Successful video watched: Time sleep: {video_duration}, Video: {video_title}')
+
+
+def filtration(browser, filtration_type: str, time_sleep: random = random.randint(1, 3)):
+    logger.info(f'Trying to find video for the all {filtration_type.upper()}...')
+    scrolling(browser, direction="UP")
+
+    browser.find_element_by_xpath(f"//*[contains(text(), 'Фильтры')]").click()
+    logger.info(f'Filter clicked')
+    time.sleep(time_sleep)
+    if filtration_type.lower() == 'month':
+        browser.find_element_by_xpath('''//div [@title='С фильтром "За этот месяц"']''').click()
+    elif filtration_type.lower() == 'week':
+        browser.find_element_by_xpath('''//div [@title='С фильтром "За эту неделю"']''').click()
+    elif filtration_type.lower() == 'day':
+        browser.find_element_by_xpath('''//div [@title='С фильтром "Сегодня"']''').click()
+    elif filtration_type.lower() == 'hour':
+        browser.find_element_by_xpath('''//div [@title='С фильтром "За последний час"']''').click()
+    else:
+        logger.warning('Invalid filtration type. Available types: "month", "week", "day", "hour"!')
+        raise Exception('Invalid filtration type. Available types: "month", "week", "day", "hour"')
+    logger.debug(f"Filter for last {filtration_type.upper()} clicked!")
+    time.sleep(time_sleep)
+
+
 class Bot:
     @logger.catch()
     def __init__(self, browser, time_sleep: int = random.randint(1, 3)):
@@ -71,38 +116,17 @@ class Bot:
         :param int video_duration: Video duration in seconds
         :param int time_sleep: delay between func invoking
         :param int scrolling_times: how many times to scroll down
-        :param str filter_type: filter sequence (D, MWD, H, N). M - month, W - week, D - day, H - hour, N - None
+        :param str filter_type: filter sequence (D, MWD, MDH, H, N). M - month, W - week, D - day, H - hour, N - None
         :return:
         """
         try:  # try to find video for all time
             logger.info(f"Enter into choosing_video. Video title = {video_title}")
             logger.info(f'Trying to find video for the all TIME...')
 
-            # scrolling(self.browser, scrolling_times=scrolling_times)
-
             video_elements = self.browser.find_elements_by_xpath(f'''//a [@title='{video_title}']''')
-            video_exist: bool = False
 
-            for _ in range(scrolling_times):
-                self.browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.HOME)
-                time.sleep(random.randint(1, 2))
-                if len(video_elements) > 0:
-                    self.browser.execute_script("arguments[0].scrollIntoViewIfNeeded();", video_elements[-1])
-                    logger.debug(f'Founded elements with video title: {len(video_elements)}')
-                    time.sleep(time_sleep)
-                    video_elements[-1].click()
-                    logger.info(f'Video "{video_title}" was found and clicked!')
-                    video_exist = True
-                    break
-                else:
-                    pass
-            else:
-                logger.debug(f'Raised NoSuchElementException')
-                raise se.NoSuchElementException
-
-            if video_exist:
-                time.sleep(video_duration)
-                logger.success(f'Successful video watched: Time sleep: {video_duration}, Video: {video_title}')
+            searching_video(browser=self.browser, video_elements=video_elements, video_title=video_title,
+                            video_duration=video_duration, scrolling_times=scrolling_times, time_sleep=time_sleep)
 
         except se.NoSuchElementException:
             logger.warning(f'Video \"{video_title}" was NOT found for ALL TIME. Filer type - {filter_type}')
@@ -110,42 +134,13 @@ class Bot:
                 time.sleep(time_sleep)
             if filter_type == "D":
                 try:
-                    logger.info(f'Trying to find video for the all DAY...')
-                    scrolling(self.browser, direction="UP")
-
-                    self.browser.find_element_by_xpath(f"//*[contains(text(), 'Фильтры')]").click()
-                    logger.info(f'Filter clicked')
-                    time.sleep(time_sleep)
-                    self.browser.find_element_by_xpath('''//div [@title='С фильтром "Сегодня"']''').click()
-                    logger.debug(f"Filter for last DAY clicked!")
-                    time.sleep(time_sleep)
-
-                    # scrolling(self.browser, scrolling_times=scrolling_times)
+                    filtration(browser=self.browser, filtration_type='day', time_sleep=time_sleep)
 
                     video_elements = self.browser.find_elements_by_xpath(f'''//a [@title='{video_title}']''')
-                    video_exist = False
 
-                    for _ in range(scrolling_times):
-                        self.browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.HOME)
-                        time.sleep(random.randint(1, 2))
-                        if len(video_elements) > 0:
-                            self.browser.execute_script("arguments[0].scrollIntoViewIfNeeded();", video_elements[-1])
-                            logger.debug(f'Founded elements with video title: {len(video_elements)}')
-
-                            time.sleep(time_sleep)
-                            video_elements[-1].click()
-                            logger.info(f'Video "{video_title}" was found and clicked!')
-                            video_exist = True
-                            break
-                        else:
-                            pass
-                    else:
-                        logger.debug(f'Raised NoSuchElementException')
-                        raise se.NoSuchElementException
-
-                    if video_exist:
-                        time.sleep(video_duration)
-                        logger.success(f'Successful video watched: Time sleep: {video_duration}, Video: {video_title}')
+                    searching_video(browser=self.browser, video_elements=video_elements, video_title=video_title,
+                                    video_duration=video_duration, scrolling_times=scrolling_times,
+                                    time_sleep=time_sleep)
 
                 except se.NoSuchElementException:
                     logger.warning(f'Video \"{video_title}" was NOT found for all DAY. Filer type - {filter_type}')
@@ -155,42 +150,13 @@ class Bot:
                     raise Exception(f"Error: {err}")
             if filter_type == "H":
                 try:
-                    logger.info(f'Trying to find video for the all HOUR...')
-                    scrolling(self.browser, direction="UP")
-
-                    self.browser.find_element_by_xpath(f"//*[contains(text(), 'Фильтры')]").click()
-                    logger.info(f'Filter clicked')
-                    time.sleep(time_sleep)
-                    self.browser.find_element_by_xpath('''//div [@title='С фильтром "За последний час"']''').click()
-                    logger.debug(f"Filter for last HOUR clicked!")
-                    time.sleep(time_sleep)
-
-                    # scrolling(self.browser, scrolling_times=scrolling_times)
+                    filtration(browser=self.browser, filtration_type='hour', time_sleep=time_sleep)
 
                     video_elements = self.browser.find_elements_by_xpath(f'''//a [@title='{video_title}']''')
-                    video_exist = False
 
-                    for _ in range(scrolling_times):
-                        self.browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.HOME)
-                        time.sleep(random.randint(1, 2))
-                        if len(video_elements) > 0:
-                            self.browser.execute_script("arguments[0].scrollIntoViewIfNeeded();", video_elements[-1])
-                            logger.debug(f'Founded elements with video title: {len(video_elements)}')
-
-                            time.sleep(time_sleep)
-                            video_elements[-1].click()
-                            logger.info(f'Video "{video_title}" was found and clicked!')
-                            video_exist = True
-                            break
-                        else:
-                            pass
-                    else:
-                        logger.debug(f'Raised NoSuchElementException')
-                        raise se.NoSuchElementException
-
-                    if video_exist:
-                        time.sleep(video_duration)
-                        logger.success(f'Successful video watched: Time sleep: {video_duration}, Video: {video_title}')
+                    searching_video(browser=self.browser, video_elements=video_elements, video_title=video_title,
+                                    video_duration=video_duration, scrolling_times=scrolling_times,
+                                    time_sleep=time_sleep)
 
                 except se.NoSuchElementException:
                     logger.warning(f'Video \"{video_title}" was NOT found for all HOUR. Filer type - {filter_type}')
@@ -198,131 +164,87 @@ class Bot:
                 except Exception as err:
                     logger.exception(f"Error: {err}")
                     raise Exception(f"Error: {err}")
-            if filter_type == "MWD":
+            if filter_type == "MDH":
                 try:
-                    logger.info(f'Trying to find video for the all MONTH...')
-                    scrolling(self.browser, direction="UP")
-
-                    self.browser.find_element_by_xpath(f"//*[contains(text(), 'Фильтры')]").click()
-                    logger.info(f'Filter clicked')
-                    time.sleep(time_sleep)
-                    self.browser.find_element_by_xpath('''//div [@title='С фильтром "За этот месяц"']''').click()
-                    logger.debug(f"Filter for last MONTH clicked!")
-                    time.sleep(time_sleep)
-
-                    # scrolling(self.browser, scrolling_times=scrolling_times)
+                    filtration(browser=self.browser, filtration_type='month', time_sleep=time_sleep)
 
                     video_elements = self.browser.find_elements_by_xpath(f'''//a [@title='{video_title}']''')
-                    video_exist = False
 
-                    for _ in range(scrolling_times):
-                        self.browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.HOME)
-                        time.sleep(random.randint(1, 2))
-                        if len(video_elements) > 0:
-                            self.browser.execute_script("arguments[0].scrollIntoViewIfNeeded();", video_elements[-1])
-                            logger.debug(f'Founded elements with video title: {len(video_elements)}')
-
-                            time.sleep(time_sleep)
-                            video_elements[-1].click()
-                            logger.info(f'Video "{video_title}" was found and clicked!')
-                            video_exist = True
-                            break
-                        else:
-                            pass
-                    else:
-                        logger.debug(f'Raised NoSuchElementException')
-                        raise se.NoSuchElementException
-
-                    if video_exist:
-                        time.sleep(video_duration)
-                        logger.success(f'Successful video watched: Time sleep: {video_duration}, Video: {video_title}')
+                    searching_video(browser=self.browser, video_elements=video_elements, video_title=video_title,
+                                    video_duration=video_duration, scrolling_times=scrolling_times,
+                                    time_sleep=time_sleep)
 
                 except se.NoSuchElementException:
+                    logger.warning(f'Video \"{video_title}" was NOT found for ALL MONTH. Filer type - {filter_type}')
                     try:
-                        logger.info(f'Trying to find video for the all DAY...')
-                        scrolling(self.browser, direction="UP")
-
-                        self.browser.find_element_by_xpath(f"//*[contains(text(), 'Фильтры')]").click()
-                        logger.info(f'Filter clicked')
-                        time.sleep(time_sleep)
-                        self.browser.find_element_by_xpath('''//div [@title='С фильтром "Сегодня"']''').click()
-                        logger.debug(f"Filter for last DAY clicked!")
-                        time.sleep(time_sleep)
-
-                        # scrolling(self.browser, scrolling_times=scrolling_times)
+                        filtration(browser=self.browser, filtration_type='day', time_sleep=time_sleep)
 
                         video_elements = self.browser.find_elements_by_xpath(f'''//a [@title='{video_title}']''')
-                        video_exist = False
 
-                        for _ in range(scrolling_times):
-                            self.browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.HOME)
-                            time.sleep(random.randint(1, 2))
-                            if len(video_elements) > 0:
-                                self.browser.execute_script("arguments[0].scrollIntoViewIfNeeded();",
-                                                            video_elements[-1])
-                                logger.debug(f'Founded elements with video title: {len(video_elements)}')
-
-                                time.sleep(time_sleep)
-                                video_elements[-1].click()
-                                logger.info(f'Video "{video_title}" was found and clicked!')
-                                video_exist = True
-                                break
-                            else:
-                                pass
-                        else:
-                            logger.debug(f'Raised NoSuchElementException')
-                            raise se.NoSuchElementException
-
-                        if video_exist:
-                            time.sleep(video_duration)
-                            logger.success(
-                                f'Successful video watched: Time sleep: {video_duration}, Video: {video_title}')
+                        searching_video(browser=self.browser, video_elements=video_elements, video_title=video_title,
+                                        video_duration=video_duration, scrolling_times=scrolling_times,
+                                        time_sleep=time_sleep)
 
                     except se.NoSuchElementException:
+                        logger.warning(f'Video \"{video_title}" was NOT found for ALL DAY. Filer type - {filter_type}')
                         try:
-                            logger.info(f'Trying to find video for the all HOUR...')
-                            scrolling(self.browser, direction="UP")
-
-                            self.browser.find_element_by_xpath(f"//*[contains(text(), 'Фильтры')]").click()
-                            logger.info(f'Filter clicked')
-                            time.sleep(time_sleep)
-                            self.browser.find_element_by_xpath(
-                                '''//div [@title='С фильтром "За последний час"']''').click()
-                            logger.debug(f"Filter for last HOUR clicked!")
-                            time.sleep(time_sleep)
-
-                            # scrolling(self.browser, scrolling_times=scrolling_times)
+                            filtration(browser=self.browser, filtration_type='hour', time_sleep=time_sleep)
 
                             video_elements = self.browser.find_elements_by_xpath(f'''//a [@title='{video_title}']''')
-                            video_exist = False
 
-                            for _ in range(scrolling_times):
-                                self.browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.HOME)
-                                time.sleep(random.randint(1, 2))
-                                if len(video_elements) > 0:
-                                    self.browser.execute_script("arguments[0].scrollIntoViewIfNeeded();",
-                                                                video_elements[-1])
-                                    logger.debug(f'Founded elements with video title: {len(video_elements)}')
-
-                                    time.sleep(time_sleep)
-                                    video_elements[-1].click()
-                                    logger.info(f'Video "{video_title}" was found and clicked!')
-                                    video_exist = True
-                                    break
-                                else:
-                                    pass
-                            else:
-                                logger.debug(f'Raised NoSuchElementException')
-                                raise se.NoSuchElementException
-
-                            if video_exist:
-                                time.sleep(video_duration)
-                                logger.success(
-                                    f'Successful video watched: Time sleep: {video_duration}, Video: {video_title}')
+                            searching_video(browser=self.browser, video_elements=video_elements,
+                                            video_title=video_title,
+                                            video_duration=video_duration, scrolling_times=scrolling_times,
+                                            time_sleep=time_sleep)
 
                         except se.NoSuchElementException:
                             logger.warning(
                                 f'Video \"{video_title}" was NOT found for all HOUR. Filer type - {filter_type}')
+                            time.sleep(time_sleep)
+                        except Exception as err:
+                            logger.exception(f"Error: {err}")
+                            raise Exception(f"Error: {err}")
+                    except Exception as err:
+                        logger.exception(f"Error: {err}")
+                        raise Exception(f"Error: {err}")
+                except Exception as err:
+                    logger.exception(f"Error: {err}")
+                    raise Exception(f"Error: {err}")
+            if filter_type == "MWD":
+                try:
+                    filtration(browser=self.browser, filtration_type='month', time_sleep=time_sleep)
+
+                    video_elements = self.browser.find_elements_by_xpath(f'''//a [@title='{video_title}']''')
+
+                    searching_video(browser=self.browser, video_elements=video_elements, video_title=video_title,
+                                    video_duration=video_duration, scrolling_times=scrolling_times,
+                                    time_sleep=time_sleep)
+
+                except se.NoSuchElementException:
+                    logger.warning(f'Video \"{video_title}" was NOT found for ALL MONTH. Filer type - {filter_type}')
+                    try:
+                        filtration(browser=self.browser, filtration_type='week', time_sleep=time_sleep)
+
+                        video_elements = self.browser.find_elements_by_xpath(f'''//a [@title='{video_title}']''')
+
+                        searching_video(browser=self.browser, video_elements=video_elements, video_title=video_title,
+                                        video_duration=video_duration, scrolling_times=scrolling_times,
+                                        time_sleep=time_sleep)
+
+                    except se.NoSuchElementException:
+                        logger.warning(f'Video \"{video_title}" was NOT found for ALL WEEK. Filer type - {filter_type}')
+                        try:
+                            filtration(browser=self.browser, filtration_type='day', time_sleep=time_sleep)
+
+                            video_elements = self.browser.find_elements_by_xpath(f'''//a [@title='{video_title}']''')
+                            searching_video(browser=self.browser, video_elements=video_elements,
+                                            video_title=video_title,
+                                            video_duration=video_duration, scrolling_times=scrolling_times,
+                                            time_sleep=time_sleep)
+
+                        except se.NoSuchElementException:
+                            logger.warning(
+                                f'Video \"{video_title}" was NOT found for all DAY. Filer type - {filter_type}')
                             time.sleep(time_sleep)
                         except Exception as err:
                             logger.exception(f"Error: {err}")
@@ -347,6 +269,7 @@ class Bot:
         """
         try:
             logger.info(f"Enter into changing channel. Current channel: {channel_name}")
+            time.sleep(time_sleep)
             self.browser.get(self.link)
             time.sleep(time_sleep)
             self.browser.find_element_by_id('avatar-btn').click()
