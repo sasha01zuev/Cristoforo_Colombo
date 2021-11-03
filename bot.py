@@ -274,7 +274,7 @@ class Bot:
         :return: 
         """
         try:
-            logger.info(f"Enter into changing account. Current account: {channel_name}")
+            logger.info(f"Enter into changing channel. Current channel: {channel_name}")
             self.browser.get(self.link)
             time.sleep(time_sleep)
             self.browser.find_element_by_id('avatar-btn').click()
@@ -291,7 +291,7 @@ class Bot:
                 time.sleep(time_sleep)
             else:
                 logger.warning(f'So many elements of channel name on the page. Quantity: {len(channel)}')
-                raise Exception(f"So many elements of channel name on the page. Quantity: {len(channel)}")
+                # raise Exception(f"So many elements of channel name on the page. Quantity: {len(channel)}")
             logger.info(f"Channel successfully changed")
             time.sleep(time_sleep)
         except se.NoSuchElementException:

@@ -77,6 +77,5 @@ def main(accounts: list):
 
 
 if __name__ == '__main__':
-
     p = Pool(processes=process_count)
     p.map(main, accounts)
