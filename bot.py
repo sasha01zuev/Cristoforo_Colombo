@@ -116,7 +116,7 @@ class Bot:
         :param int video_duration: Video duration in seconds
         :param int time_sleep: delay between func invoking
         :param int scrolling_times: how many times to scroll down
-        :param str filter_type: filter sequence (D, MWD, MDH, H, N). M - month, W - week, D - day, H - hour, N - None
+        :param str filter_type: filter sequence (D, MWD, MDH, HD,  H, N). M - month, W - week, D - day, H - hour, N - None
         :return:
         """
         try:  # try to find video for all time
@@ -249,6 +249,38 @@ class Bot:
                         except Exception as err:
                             logger.exception(f"Error: {err}")
                             raise Exception(f"Error: {err}")
+                    except Exception as err:
+                        logger.exception(f"Error: {err}")
+                        raise Exception(f"Error: {err}")
+                except Exception as err:
+                    logger.exception(f"Error: {err}")
+                    raise Exception(f"Error: {err}")
+            if filter_type == "HD":
+                try:
+                    filtration(browser=self.browser, filtration_type='hour', time_sleep=time_sleep)
+
+                    video_elements = self.browser.find_elements_by_xpath(f'''//a [@title='{video_title}']''')
+
+                    searching_video(browser=self.browser, video_elements=video_elements,
+                                    video_title=video_title,
+                                    video_duration=video_duration, scrolling_times=scrolling_times,
+                                    time_sleep=time_sleep)
+                except se.NoSuchElementException:
+                    logger.warning(
+                        f'Video \"{video_title}" was NOT found for all HOUR. Filer type - {filter_type}')
+                    try:
+                        filtration(browser=self.browser, filtration_type='day', time_sleep=time_sleep)
+
+                        video_elements = self.browser.find_elements_by_xpath(f'''//a [@title='{video_title}']''')
+
+                        searching_video(browser=self.browser, video_elements=video_elements,
+                                        video_title=video_title,
+                                        video_duration=video_duration, scrolling_times=scrolling_times,
+                                        time_sleep=time_sleep)
+                    except se.NoSuchElementException:
+                        logger.warning(
+                            f'Video \"{video_title}" was NOT found for all DAY. Filer type - {filter_type}')
+                        time.sleep(time_sleep)
                     except Exception as err:
                         logger.exception(f"Error: {err}")
                         raise Exception(f"Error: {err}")
