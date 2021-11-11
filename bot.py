@@ -304,13 +304,35 @@ class Bot:
             time.sleep(time_sleep)
             self.browser.get(self.link)
             time.sleep(time_sleep)
-            self.browser.find_element_by_id('avatar-btn').click()
-            logger.info(f"Avatar clicked")
-            time.sleep(time_sleep)
-            self.browser.find_elements_by_class_name('style-scope.yt-multi-page-menu-section-renderer')[7].click()
-            logger.info(f"Change account button clicked")
+
+            try:
+                logger.info(f"Pre avatar click")
+                self.browser.find_element_by_id('avatar-btn').click()
+                logger.info(f"Avatar clicked")
+            except se.NoSuchElementException:
+                logger.info(f"Pre avatar clicked in NoSuchElementException")
+                self.browser.refresh()
+                time.sleep(time_sleep)
+                self.browser.find_element_by_id('avatar-btn').click()
+                logger.info(f"Avatar clicked in NoSuchElementException")
+            except Exception as err:
+                logger.exception(f"Error in avatar click: {err}")
+                raise Exception(f"Error: {err}")
+
             time.sleep(time_sleep)
 
+            try:
+                self.browser.find_elements_by_class_name('style-scope.yt-multi-page-menu-section-renderer')[7].click()
+                logger.info(f"Change account button clicked")
+            except se.NoSuchElementException:
+                logger.info(f"Pre 'changing account' clicked in NoSuchElementException")
+                self.browser.find_element_by_xpath(f"//*[contains(text(), 'Сменить аккаунт')]").click()
+                logger.info(f"Change account button clicked in NoSuchElementException")
+            except Exception as err:
+                logger.exception(f"Error in changing account click: {err}")
+                raise Exception(f"Error: {err}")
+
+            time.sleep(time_sleep)
             channel = self.browser.find_elements_by_xpath(f"//*[contains(text(), '{channel_name}')]")
             logger.debug(f'Founded elements with channel name: {len(channel)}')
             if 1 <= len(channel) < 5:
