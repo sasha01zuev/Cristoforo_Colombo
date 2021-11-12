@@ -36,10 +36,14 @@ def searching_video(browser, video_elements, video_title: str, video_duration: i
             browser.execute_script("arguments[0].scrollIntoViewIfNeeded();", video_elements[-1])
             logger.debug(f'Founded elements with video title: {len(video_elements)}')
             time.sleep(time_sleep)
-            video_elements[-1].click()
-            logger.info(f'Video "{video_title}" was found and clicked!')
-            video_exist = True
-            break
+            try:
+                video_elements[-1].click()
+                logger.info(f'Video "{video_title}" was found and clicked!')
+                video_exist = True
+                break
+            except Exception as err:
+                logger.info(f'Exception in searching video. More details:\n {err}')
+
         else:
             pass
     else:
