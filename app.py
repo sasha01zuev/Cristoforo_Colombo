@@ -15,8 +15,8 @@ def bot_executor(account: str, searching_queries: list, video_title: str, video_
                  scrolling_times: int, chromedriver_executable_path: str, repeats: int = 1
                  ):
     profile_number = ACCOUNTS[f'{account}'][0]
-    logger.add(f'info{profile_number}.log', format="{time:YYYY-MM-DD at HH:mm:ss} {level} {message}", rotation="10 MB",
-               compression='zip', level="DEBUG", backtrace=True, diagnose=True)
+    logger.add(f'info{profile_number}.log', format="{time:YYYY-MM-DD at HH:mm:ss} {level} {message}",
+               rotation="10 MB", compression='zip', level="DEBUG", backtrace=True, diagnose=True)
     channels = ACCOUNTS[f'{account}'][1]
     options = uc.ChromeOptions()
 
