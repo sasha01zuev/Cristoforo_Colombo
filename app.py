@@ -66,14 +66,16 @@ def main(accounts: list):
                  scrolling_times=scrolling_times, repeats=repeats,
                  chromedriver_executable_path=chromedriver_executable_path)
 
-    # # If u need to add new account with new profile - uncomment the code, then comment out code above
+
+
+    # If u need to add new account with new profile - uncomment the code, then comment out code above
     # options = uc.ChromeOptions()
     # options.user_data_dir = f"c:\\temp\\profile3"
     # # just some options passing in to skip annoying popups
     # browser = uc.Chrome(options=options)
     # # setting profile
     # browser.get('https://youtube.com')
-    # time.sleep(300)
+    # time.sleep(400)
 
 
 if __name__ == '__main__':

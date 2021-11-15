@@ -28,7 +28,7 @@ def scrolling(browser, direction: str = "DOWN", scrolling_times: int = 5):
 
 
 def searching_video(browser, video_elements, video_title: str, video_duration: int,
-                    video_exist: bool = False, scrolling_times: int = 5, time_sleep: random = random.randint(1, 3)):
+                    video_exist: bool = False, scrolling_times: int = 5, time_sleep: random = random.randint(2, 3)):
     for _ in range(scrolling_times):
         browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.END)
         time.sleep(random.randint(1, 2))
@@ -54,7 +54,7 @@ def searching_video(browser, video_elements, video_title: str, video_duration: i
         logger.success(f'Successful video watched: Time sleep: {video_duration}, Video: {video_title}')
 
 
-def filtration(browser, filtration_type: str, time_sleep: random = random.randint(1, 3)):
+def filtration(browser, filtration_type: str, time_sleep: random = random.randint(2, 3)):
     logger.info(f'Trying to find video for the all {filtration_type.upper()}...')
     scrolling(browser, direction="UP")
 
@@ -78,7 +78,7 @@ def filtration(browser, filtration_type: str, time_sleep: random = random.randin
 
 class Bot:
     @logger.catch()
-    def __init__(self, browser, time_sleep: int = random.randint(1, 3)):
+    def __init__(self, browser, time_sleep: int = random.randint(2, 3)):
         """
         Class constructor with simultaneous automatic opening site
 
@@ -111,7 +111,7 @@ class Bot:
             raise Exception(f"Error: {err}")
 
     def choosing_video(self, video_title, video_duration: int = 5, filter_type: str = "D",
-                       scrolling_times: int = 3, time_sleep: random = random.randint(1, 3)):
+                       scrolling_times: int = 3, time_sleep: random = random.randint(2, 4)):
         """
         Trying to find specific video which equal video_title.
         If not found for all time -> going to filters in the assigned order
