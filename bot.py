@@ -27,11 +27,12 @@ def scrolling(browser, direction: str = "DOWN", scrolling_times: int = 5):
         time.sleep(random.randint(1, 3))
 
 
-def searching_video(browser, video_elements, video_title: str, video_duration: int,
+def searching_video(browser,  video_title: str, video_duration: int,
                     video_exist: bool = False, scrolling_times: int = 5, time_sleep: random = random.randint(2, 3)):
     for _ in range(scrolling_times):
         browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.END)
         time.sleep(random.randint(1, 2))
+        video_elements = browser.find_elements_by_xpath(f'''//a [@title='{video_title}']''')
         if len(video_elements) > 0:
             browser.execute_script("arguments[0].scrollIntoViewIfNeeded();", video_elements[-1])
             logger.debug(f'Founded elements with video title: {len(video_elements)}')
@@ -48,6 +49,7 @@ def searching_video(browser, video_elements, video_title: str, video_duration: i
             pass
     else:
         raise se.NoSuchElementException
+        # pass
 
     if video_exist:
         time.sleep(video_duration)
@@ -129,7 +131,7 @@ class Bot:
 
             video_elements = self.browser.find_elements_by_xpath(f'''//a [@title='{video_title}']''')
 
-            searching_video(browser=self.browser, video_elements=video_elements, video_title=video_title,
+            searching_video(browser=self.browser, video_title=video_title,
                             video_duration=video_duration, scrolling_times=scrolling_times, time_sleep=time_sleep)
 
         except se.NoSuchElementException:
@@ -142,7 +144,7 @@ class Bot:
 
                     video_elements = self.browser.find_elements_by_xpath(f'''//a [@title='{video_title}']''')
 
-                    searching_video(browser=self.browser, video_elements=video_elements, video_title=video_title,
+                    searching_video(browser=self.browser,  video_title=video_title,
                                     video_duration=video_duration, scrolling_times=scrolling_times,
                                     time_sleep=time_sleep)
 
@@ -158,7 +160,7 @@ class Bot:
 
                     video_elements = self.browser.find_elements_by_xpath(f'''//a [@title='{video_title}']''')
 
-                    searching_video(browser=self.browser, video_elements=video_elements, video_title=video_title,
+                    searching_video(browser=self.browser,  video_title=video_title,
                                     video_duration=video_duration, scrolling_times=scrolling_times,
                                     time_sleep=time_sleep)
 
@@ -174,7 +176,7 @@ class Bot:
 
                     video_elements = self.browser.find_elements_by_xpath(f'''//a [@title='{video_title}']''')
 
-                    searching_video(browser=self.browser, video_elements=video_elements, video_title=video_title,
+                    searching_video(browser=self.browser, video_title=video_title,
                                     video_duration=video_duration, scrolling_times=scrolling_times,
                                     time_sleep=time_sleep)
 
@@ -185,7 +187,7 @@ class Bot:
 
                         video_elements = self.browser.find_elements_by_xpath(f'''//a [@title='{video_title}']''')
 
-                        searching_video(browser=self.browser, video_elements=video_elements, video_title=video_title,
+                        searching_video(browser=self.browser, video_title=video_title,
                                         video_duration=video_duration, scrolling_times=scrolling_times,
                                         time_sleep=time_sleep)
 
@@ -196,7 +198,7 @@ class Bot:
 
                             video_elements = self.browser.find_elements_by_xpath(f'''//a [@title='{video_title}']''')
 
-                            searching_video(browser=self.browser, video_elements=video_elements,
+                            searching_video(browser=self.browser,
                                             video_title=video_title,
                                             video_duration=video_duration, scrolling_times=scrolling_times,
                                             time_sleep=time_sleep)
@@ -220,7 +222,7 @@ class Bot:
 
                     video_elements = self.browser.find_elements_by_xpath(f'''//a [@title='{video_title}']''')
 
-                    searching_video(browser=self.browser, video_elements=video_elements, video_title=video_title,
+                    searching_video(browser=self.browser, video_title=video_title,
                                     video_duration=video_duration, scrolling_times=scrolling_times,
                                     time_sleep=time_sleep)
 
@@ -231,7 +233,7 @@ class Bot:
 
                         video_elements = self.browser.find_elements_by_xpath(f'''//a [@title='{video_title}']''')
 
-                        searching_video(browser=self.browser, video_elements=video_elements, video_title=video_title,
+                        searching_video(browser=self.browser, video_title=video_title,
                                         video_duration=video_duration, scrolling_times=scrolling_times,
                                         time_sleep=time_sleep)
 
@@ -241,7 +243,7 @@ class Bot:
                             filtration(browser=self.browser, filtration_type='day', time_sleep=time_sleep)
 
                             video_elements = self.browser.find_elements_by_xpath(f'''//a [@title='{video_title}']''')
-                            searching_video(browser=self.browser, video_elements=video_elements,
+                            searching_video(browser=self.browser,
                                             video_title=video_title,
                                             video_duration=video_duration, scrolling_times=scrolling_times,
                                             time_sleep=time_sleep)
@@ -265,7 +267,7 @@ class Bot:
 
                     video_elements = self.browser.find_elements_by_xpath(f'''//a [@title='{video_title}']''')
 
-                    searching_video(browser=self.browser, video_elements=video_elements,
+                    searching_video(browser=self.browser,
                                     video_title=video_title,
                                     video_duration=video_duration, scrolling_times=scrolling_times,
                                     time_sleep=time_sleep)
@@ -277,7 +279,7 @@ class Bot:
 
                         video_elements = self.browser.find_elements_by_xpath(f'''//a [@title='{video_title}']''')
 
-                        searching_video(browser=self.browser, video_elements=video_elements,
+                        searching_video(browser=self.browser,
                                         video_title=video_title,
                                         video_duration=video_duration, scrolling_times=scrolling_times,
                                         time_sleep=time_sleep)

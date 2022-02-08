@@ -39,7 +39,7 @@ def bot_executor(account: str, searching_queries: list, video_title: str, video_
                 logger.success('Successfully inputting of query')
                 bot.choosing_video(video_title=f'{video_title}', video_duration=video_duration,
                                    filter_type=f'{filter_type}', scrolling_times=scrolling_times)
-                logger.success('Successfully finding video')
+                logger.debug('After finding video')
                 bot.change_channel(channel_name=f'{channel}')
                 logger.success('Successfully changing channel')
             logger.success('Successful passage of the circle of channels')
@@ -68,9 +68,9 @@ def main(accounts: list):
 
 
 
-    # If u need to add new account with new profile - uncomment the code, then comment out code above
+    # # If u need to add new account with new profile - uncomment the code, then comment out code above
     # options = uc.ChromeOptions()
-    # options.user_data_dir = f"c:\\temp\\profile3"
+    # options.user_data_dir = f"c:\\temp\\profile5"
     # # just some options passing in to skip annoying popups
     # browser = uc.Chrome(options=options)
     # # setting profile
@@ -79,5 +79,6 @@ def main(accounts: list):
 
 
 if __name__ == '__main__':
+    # p = Pool(processes=1)
     p = Pool(processes=process_count)
     p.map(main, accounts)
