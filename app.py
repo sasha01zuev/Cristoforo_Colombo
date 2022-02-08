@@ -66,8 +66,6 @@ def main(accounts: list):
                  scrolling_times=scrolling_times, repeats=repeats,
                  chromedriver_executable_path=chromedriver_executable_path)
 
-
-
     # # If u need to add new account with new profile - uncomment the code, then comment out code above
     # options = uc.ChromeOptions()
     # options.user_data_dir = f"c:\\temp\\profile5"
