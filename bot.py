@@ -59,7 +59,8 @@ def searching_video(browser,  video_title: str, video_duration: int,
 def filtration(browser, filtration_type: str, time_sleep: random = random.randint(2, 3)):
     logger.info(f'Trying to find video for the all {filtration_type.upper()}...')
     scrolling(browser, direction="UP")
-
+    time.sleep(time_sleep)
+    print('Фильтры:\n', browser.find_element_by_xpath(f"//*[contains(text(), 'Фильтры')]"))
     browser.find_element_by_xpath(f"//*[contains(text(), 'Фильтры')]").click()
     logger.info(f'Filter clicked')
     time.sleep(time_sleep)
@@ -68,6 +69,7 @@ def filtration(browser, filtration_type: str, time_sleep: random = random.randin
     elif filtration_type.lower() == 'week':
         browser.find_element_by_xpath('''//div [@title='С фильтром "За эту неделю"']''').click()
     elif filtration_type.lower() == 'day':
+        print('Filter elements:\n', browser.find_elements_by_xpath('''//div [@title='С фильтром "Сегодня"']'''))
         browser.find_element_by_xpath('''//div [@title='С фильтром "Сегодня"']''').click()
     elif filtration_type.lower() == 'hour':
         browser.find_element_by_xpath('''//div [@title='С фильтром "За последний час"']''').click()
@@ -297,7 +299,7 @@ class Bot:
             logger.exception(f"Error: {err}")
             raise Exception(f"Error: {err}")
 
-    def change_channel(self, channel_name: str, time_sleep: random = random.randint(2, 4)):
+    def change_channel(self, channel_name: str, time_sleep: random = random.randint(3, 8)):
         """
         Changing channel to next from list of names
 
@@ -313,6 +315,7 @@ class Bot:
 
             try:
                 logger.info(f"Pre avatar click")
+                print("Avatar btns:\n", self.browser.find_elements_by_id('avatar-btn'))
                 self.browser.find_element_by_id('avatar-btn').click()
                 logger.info(f"Avatar clicked")
             except se.NoSuchElementException:
@@ -328,6 +331,7 @@ class Bot:
             time.sleep(time_sleep)
 
             try:
+                print("ELEMENTS:\n", self.browser.find_elements_by_xpath(f"//*[contains(text(), 'Сменить аккаунт')]"))
                 self.browser.find_elements_by_class_name('style-scope.yt-multi-page-menu-section-renderer')[7].click()
                 logger.info(f"Change account button clicked")
             except se.NoSuchElementException:

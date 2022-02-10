@@ -68,7 +68,7 @@ def main(accounts: list):
 
     # # If u need to add new account with new profile - uncomment the code, then comment out code above
     # options = uc.ChromeOptions()
-    # options.user_data_dir = f"c:\\temp\\profile5"
+    # options.user_data_dir = f"c:\\temp\\profile1"
     # # just some options passing in to skip annoying popups
     # browser = uc.Chrome(options=options)
     # # setting profile
