@@ -1,10 +1,12 @@
 import random
 import time
+from multiprocessing import Pool
+
 from loguru import logger
 from bot import Bot, scrolling
 import undetected_chromedriver.v2 as uc
 from config import ACCOUNTS, QUERIES, BOT
-from multiprocessing import Pool
+import concurrent.futures
 import selenium.common.exceptions as se
 
 
@@ -94,6 +96,12 @@ def main(accounts: list):
 
 
 if __name__ == '__main__':
-    p = Pool(processes=1)
+    # # p = Pool(processes=1)
     # p = Pool(processes=process_count)
-    p.map(main, accounts)
+    # p.map(main, accounts)
+
+    # for account in accounts:
+    my_thread = concurrent.futures.ThreadPoolExecutor(max_workers=process_count)
+    my_thread.map(main, accounts)
+    # my_thread = threading.Thread(target=main, args=(accounts,))
+    # my_thread.start()

@@ -390,7 +390,6 @@ class Bot:
         channels = self.browser.find_elements_by_xpath(f"//*[contains(text(), '{channel_name}')]")
 
         for channel in channels[::-1]:
-
             try:
                 channel.click()
                 break
