@@ -5,6 +5,7 @@ from bot import Bot, scrolling
 import undetected_chromedriver.v2 as uc
 from config import ACCOUNTS, QUERIES, BOT
 from multiprocessing import Pool
+import selenium.common.exceptions as se
 
 
 accounts = list(ACCOUNTS.keys())
@@ -35,12 +36,28 @@ def bot_executor(account: str, searching_queries: list, video_title: str, video_
             for channel in channels:
                 logger.info(f'Current channel: {channel}')
 
-                bot.inputting_query(f'{query}')
-                logger.success('Successfully inputting of query')
+                for i in range(5):
+                    try:
+                        bot.inputting_query(f'{query}')
+                        break
+                    except se.NoSuchElementException:
+                        pass
+                else:
+                    continue
+
                 bot.choosing_video(video_title=f'{video_title}', video_duration=video_duration,
                                    filter_type=f'{filter_type}', scrolling_times=scrolling_times)
                 logger.debug('After finding video')
-                bot.change_channel(channel_name=f'{channel}')
+
+                for i in range(5):
+                    try:
+                        bot.change_channel(channel_name=f'{channel}')
+                        break
+                    except se.NoSuchElementException:
+                        pass
+                else:
+                    pass
+
                 logger.success('Successfully changing channel')
             logger.success('Successful passage of the circle of channels')
         logger.success('Successful passage of the circle of searching queries')
@@ -77,6 +94,6 @@ def main(accounts: list):
 
 
 if __name__ == '__main__':
-    # p = Pool(processes=1)
-    p = Pool(processes=process_count)
+    p = Pool(processes=1)
+    # p = Pool(processes=process_count)
     p.map(main, accounts)
