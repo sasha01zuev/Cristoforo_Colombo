@@ -22,7 +22,7 @@ def bot_executor(account: str, searching_queries: list, video_title: str, video_
                rotation="10 MB", compression='zip', level="DEBUG", backtrace=True, diagnose=True)
     channels = ACCOUNTS[f'{account}'][1]
     options = uc.ChromeOptions()
-
+    options.headless = True
     # setting profile
     options.user_data_dir = f"c:\\temp\\profile{profile_number}"
 
@@ -101,7 +101,8 @@ if __name__ == '__main__':
     # p.map(main, accounts)
 
     # for account in accounts:
-    my_thread = concurrent.futures.ThreadPoolExecutor(max_workers=process_count)
-    my_thread.map(main, accounts)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=process_count) as my_thread:
+        my_thread.map(main, accounts)
+
     # my_thread = threading.Thread(target=main, args=(accounts,))
     # my_thread.start()
