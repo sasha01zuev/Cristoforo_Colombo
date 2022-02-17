@@ -3,9 +3,11 @@ import time
 from multiprocessing import Pool
 
 from loguru import logger
+
 from bot import Bot, scrolling
-import undetected_chromedriver.v2 as uc
-from config import ACCOUNTS, QUERIES, BOT
+import seleniumwire.undetected_chromedriver.v2 as uc
+from seleniumwire import webdriver
+from config import ACCOUNTS, QUERIES, BOT, PROXY
 import concurrent.futures
 import selenium.common.exceptions as se
 
@@ -21,53 +23,75 @@ def bot_executor(account: str, searching_queries: list, video_title: str, video_
     logger.add(f'info{profile_number}.log', format="{time:YYYY-MM-DD at HH:mm:ss} {level} {message}",
                rotation="10 MB", compression='zip', level="DEBUG", backtrace=True, diagnose=True)
     channels = ACCOUNTS[f'{account}'][1]
-    options = uc.ChromeOptions()
-    options.headless = True
-    # setting profile
-    options.user_data_dir = f"c:\\temp\\profile{profile_number}"
-
-    browser = uc.Chrome(options=options,
-                        executable_path=chromedriver_executable_path)
-    bot = Bot(browser=browser)
-    logger.success('Successfully created instance of Bot')
-
     for repeat in range(repeats):
-        logger.info(f'Current repeat: {repeat}')
-        for query in searching_queries:
-            logger.info(f'Current searching query: {query}')
-            for channel in channels:
-                logger.info(f'Current channel: {channel}')
+        if PROXY:
+            for proxy in PROXY:
+                options = webdriver.ChromeOptions()
+                options.headless = False
 
-                for i in range(5):
+                # setting profile
+                options.user_data_dir = f"c:\\temp\\profile{profile_number}"
+                proxy_options = {'proxy': proxy}
+                with uc.Chrome(options=options, seleniumwire_options=proxy_options,
+                               executable_path=chromedriver_executable_path) as browser:
+                    bot = Bot(browser=browser)
+
+                for query in searching_queries:
+                    for channel in channels:
+                        logger.info(f'Current channel: {channel}')
+
+                        try:
+                            bot.inputting_query(f'{query}')
+                            bot.choosing_video(video_title=f'{video_title}', video_duration=video_duration,
+                                               filter_type=f'{filter_type}', scrolling_times=scrolling_times)
+                        except se.NoSuchElementException:
+                            bot.change_channel(channel_name=f'{channel}')
+                            break
+
+                        try:
+                            bot.change_channel(channel_name=f'{channel}')
+                        except se.NoSuchElementException:
+                            break
+
+                        logger.success('Successfully changing channel')
+                    logger.success('Successful passage of the circle of channels')
+                bot.close_browser()
+                logger.success('Successful passage of the circle of searching queries')
+            logger.success('Successful passage of Proxy')
+        else:
+            options = webdriver.ChromeOptions()
+            options.headless = False
+            # setting profile
+            options.user_data_dir = f"c:\\temp\\profile{profile_number}"
+            with uc.Chrome(options=options, executable_path=chromedriver_executable_path) as browser:
+                bot = Bot(browser=browser)
+
+            for query in searching_queries:
+                for channel in channels:
+                    logger.info(f'Current channel: {channel}')
+
                     try:
                         bot.inputting_query(f'{query}')
-                        break
+                        bot.choosing_video(video_title=f'{video_title}', video_duration=video_duration,
+                                           filter_type=f'{filter_type}', scrolling_times=scrolling_times)
                     except se.NoSuchElementException:
-                        pass
-                else:
-                    continue
-
-                bot.choosing_video(video_title=f'{video_title}', video_duration=video_duration,
-                                   filter_type=f'{filter_type}', scrolling_times=scrolling_times)
-                logger.debug('After finding video')
-
-                for i in range(5):
-                    try:
                         bot.change_channel(channel_name=f'{channel}')
                         break
-                    except se.NoSuchElementException:
-                        pass
-                else:
-                    pass
 
-                logger.success('Successfully changing channel')
-            logger.success('Successful passage of the circle of channels')
-        logger.success('Successful passage of the circle of searching queries')
+                    try:
+                        bot.change_channel(channel_name=f'{channel}')
+                    except se.NoSuchElementException:
+                        break
+
+                    logger.success('Successfully changing channel')
+                logger.success('Successful passage of the circle of channels')
+            logger.success('Successful passage of the circle of searching queries')
     logger.success('Successful passage of the circle of repeats')
 
     time.sleep(10)
-    bot.close_browser()
-    logger.success('Successfully closing browser')
+
+    logger.success('Closing...')
+    raise SystemExit(1)
 
 
 def main(accounts: list):
@@ -87,7 +111,7 @@ def main(accounts: list):
 
     # # If u need to add new account with new profile - uncomment the code, then comment out code above
     # options = uc.ChromeOptions()
-    # options.user_data_dir = f"c:\\temp\\profile1"
+    # options.user_data_dir = f"c:\\temp\\profile5"
     # # just some options passing in to skip annoying popups
     # browser = uc.Chrome(options=options)
     # # setting profile
@@ -96,13 +120,11 @@ def main(accounts: list):
 
 
 if __name__ == '__main__':
-    # # p = Pool(processes=1)
-    # p = Pool(processes=process_count)
-    # p.map(main, accounts)
+
+    # with Pool(processes=process_count) as p:
+    #     p.map(main, accounts)
 
     # for account in accounts:
     with concurrent.futures.ThreadPoolExecutor(max_workers=process_count) as my_thread:
         my_thread.map(main, accounts)
 
-    # my_thread = threading.Thread(target=main, args=(accounts,))
-    # my_thread.start()
